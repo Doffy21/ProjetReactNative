@@ -4,15 +4,17 @@ import styles from "./StyleSheet";
 import { Divider, SearchBar } from "react-native-elements";
 import { useState, useEffect } from "react";
 import VilleParDefaut from "./VilleParDefaut";
+import filter from "lodash.filter"
 
 const Recherche = () => {
   // const API_RESTCOUNTRIE = `https://restcountries.com/v3.1/all`
   const [search, updateSearch] = useState("");
+  const [data, setData] = useState(VilleParDefaut)
+  const [fullData, setFullData] = useState(data);
   // const [isLoading, setIsLoading] = useState(false)
-  // const [datas, setDatas] = useState([])
   // const [error, setError] = useState(null)
 
-  const data = VilleParDefaut;
+  
 
   // useEffect(() => {
   //   setIsLoading(true)
@@ -49,13 +51,31 @@ const Recherche = () => {
     return <Divider orientation="vertical" />;
   };
 
+  const handleSearch = text => {
+    const formattedQuery = text.toLowerCase();
+    const filteredData = filter(fullData, pays => {
+      return contains(pays, formattedQuery)
+    })
+    setData(filteredData)
+    updateSearch(text);
+  }
+
+  const contains = ({name}, search) => {
+    name = name.toLowerCase()
+    if (name.includes(search)) {
+      return true
+    }
+
+    return false
+  }
+
   return (
     <View style={styles.container}>
       <SearchBar
         placeholder="Ville par défaut"
         round
         searchIcon={{ size: 24 }}
-        onChangeText={updateSearch}
+        onChangeText={searchText => handleSearch(searchText)}
         value={search}
         lightTheme={true}
         containerStyle={{
