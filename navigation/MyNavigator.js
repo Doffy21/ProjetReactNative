@@ -14,9 +14,13 @@ const MyNavigator = () => {
       <Stack.Navigator
         initialRouteName="Ville"
         screenOptions={{
+          headerStyle: {
+            backgroundColor: '#0279CA'
+          },
+          headerTintColor: '#fff',
           headerTitleAlign: "center",
           headerShadowVisible: false,
-          animation: "slide_from_right",
+          animation: "fade_from_bottom",
         }}
       >
         <Stack.Screen
@@ -26,9 +30,9 @@ const MyNavigator = () => {
             headerRight: () => (
               <TouchableOpacity
                 onPress={() => navigation.navigate("Recherche")}
-                style={{ marginRight: 20 }}
+                style={{ marginRight: 5 }}
               >
-                <Icon name="add" size={30} />
+                <Icon name="add" size={28} color={'#fff'} />
               </TouchableOpacity>
             ),
           })}

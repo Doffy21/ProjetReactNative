@@ -4,7 +4,10 @@ export default StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
+    },   
+    centered: {
+        flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-      },    
+    } 
 })
