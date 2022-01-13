@@ -1,10 +1,11 @@
 import React from "react";
-import { StyleSheet, Text, View, Button, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Ville from "../components/Ville";
 import Recherche from "../components/Recherche";
 import { Icon } from "react-native-elements";
+import DetailsMeteo from "../components/DetailsMeteo";
 
 const Stack = createNativeStackNavigator();
 
@@ -15,9 +16,9 @@ const MyNavigator = () => {
         initialRouteName="Ville"
         screenOptions={{
           headerStyle: {
-            backgroundColor: '#0279CA'
+            backgroundColor: "#0279CA",
           },
-          headerTintColor: '#fff',
+          headerTintColor: "#fff",
           headerTitleAlign: "center",
           headerShadowVisible: false,
           animation: "fade_from_bottom",
@@ -32,12 +33,17 @@ const MyNavigator = () => {
                 onPress={() => navigation.navigate("Recherche")}
                 style={{ marginRight: 5 }}
               >
-                <Icon name="add" size={28} color={'#fff'} />
+                <Icon name="add" size={28} color={"#fff"} />
               </TouchableOpacity>
             ),
           })}
         />
         <Stack.Screen name="Recherche" component={Recherche} />
+        <Stack.Screen
+          name="Details"
+          component={DetailsMeteo}
+          options={({route}) => ({title: route.params.name})}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

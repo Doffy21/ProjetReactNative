@@ -7,7 +7,6 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Modal,
-  Button,
   ToastAndroid,
 } from "react-native";
 import styles from "./StyleSheet";
@@ -16,37 +15,49 @@ import { useState, useEffect } from "react";
 import VilleParDefaut from "./VilleParDefaut";
 import filter from "lodash.filter";
 
-const Recherche = () => {
+const Recherche = ({ navigation }) => {
   const [search, updateSearch] = useState("");
   const [data, setData] = useState(VilleParDefaut);
   const [fullData, setFullData] = useState(data);
   const [modalVisibe, setModalVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false)
-  const [cityFound, setCityFound] = useState({ id: "2279755", name: "Yamoussoukro", country: "CI" });
+  const [isLoading, setIsLoading] = useState(false);
+  const [cityFound, setCityFound] = useState({
+    id: "2279755",
+    name: "Yamoussoukro",
+    country: "CI",
+  });
 
   useEffect(() => {
-    
     if (modalVisibe) {
-      setIsLoading(true)
-      fetch(`http://api.openweathermap.org/data/2.5/weather?q=${search}&APPID=792989e728dbf7b2d7cf2d3596a10997`)
+      setIsLoading(true);
+      fetch(
+        `http://api.openweathermap.org/data/2.5/weather?q=${search}&APPID=792989e728dbf7b2d7cf2d3596a10997`
+      )
         .then((response) => response.json())
         .then((results) => {
-          setCityFound({ id: results.id, name: results.name, country: results.sys.country });
+          setCityFound({
+            id: results.id,
+            name: results.name,
+            country: results.sys.country,
+          });
           setIsLoading(false);
         })
-        .catch(err => {
-          setModalVisible(!modalVisibe)
+        .catch((err) => {
+          setModalVisible(!modalVisibe);
           setIsLoading(false);
-          alert("Vérifiez votre connexion ou la ville saisie !")
-        });      
+          ToastAndroid.show(
+            "Vérifiez votre connexion ou la ville saisie !",
+            ToastAndroid.SHORT
+          );
+        });
     }
-
-  }, [modalVisibe])
+  }, [modalVisibe]);
 
   const separator = () => {
     return <Divider orientation="vertical" />;
   };
 
+  //Fonction pour trier les valeur de la liste des villes
   const handleSearch = (text) => {
     const formattedQuery = text.toLowerCase();
     const filteredData = filter(fullData, (pays) => {
@@ -65,34 +76,39 @@ const Recherche = () => {
     return false;
   };
 
+  //Fonction qui s'exécute après la validation de la recherche
   const submitEditing = (valueSearch) => {
     if (valueSearch == "") {
-      ToastAndroid.show("Veuillez entrer le nom de la ville !", ToastAndroid.SHORT)
+      ToastAndroid.show(
+        "Veuillez entrer le nom de la ville !",
+        ToastAndroid.SHORT
+      );
     }
 
     if (data.length != 0) {
-      ToastAndroid.show("Déjà dans la liste des villes !", ToastAndroid.SHORT)
+      ToastAndroid.show("Déjà dans la liste des villes !", ToastAndroid.SHORT);
     } else {
       setModalVisible(true);
     }
   };
 
-  const addNewCity = (id,name,country) => {
-    VilleParDefaut.push({id:id,name:name,country:country})
-    setModalVisible(!modalVisibe)
-    console.log(VilleParDefaut)
-  }
+  // Fonction qui ajoute les villes
+  const addNewCity = (id, name, country) => {
+    VilleParDefaut.push({ id: id, name: name, country: country });
+    setModalVisible(!modalVisibe);
+    handleSearch("");
+    navigation.navigate("Details", cityFound);
+  };
 
-
-  const ContainModal =() => {
+  //Contenu du modal
+  const ContainModal = () => {
     if (isLoading) {
       return (
         <>
-          <ActivityIndicator size={"large"} color={"#0279CA"} />   
+          <ActivityIndicator size={"large"} color={"#0279CA"} />
         </>
-      )
-    }
-    else {
+      );
+    } else {
       return (
         <>
           <Text style={{ marginBottom: 10 }}>
@@ -103,13 +119,30 @@ const Recherche = () => {
               flexDirection: "row",
             }}
           >
-            <TouchableOpacity style={{ marginRight: 10 }} onPress={() => addNewCity(cityFound.id,cityFound.name,cityFound.country)}>
-              <Text style={{ backgroundColor: "#0279CA", color: "white", padding: 10 }}>
+            <TouchableOpacity
+              style={{ marginRight: 10 }}
+              onPress={() =>
+                addNewCity(cityFound.id, cityFound.name, cityFound.country)
+              }
+            >
+              <Text
+                style={{
+                  backgroundColor: "#0279CA",
+                  color: "white",
+                  padding: 10,
+                }}
+              >
                 AJOUTER
               </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setModalVisible(!modalVisibe)}>
-              <Text style={{ backgroundColor: "#ececec", color: "black", padding: 10 }}>
+              <Text
+                style={{
+                  backgroundColor: "#ececec",
+                  color: "black",
+                  padding: 10,
+                }}
+              >
                 ANNULER
               </Text>
             </TouchableOpacity>
@@ -117,7 +150,7 @@ const Recherche = () => {
         </>
       );
     }
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -147,8 +180,8 @@ const Recherche = () => {
 
       <Modal animationType="fade" transparent={true} visible={modalVisibe}>
         <View style={styles.centered}>
-          <View style={styles.modalView}>
-            <ContainModal/>
+          <View style={stylesLocal.modalView}>
+            <ContainModal />
           </View>
         </View>
       </Modal>
@@ -160,7 +193,11 @@ const Recherche = () => {
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => {
-              alert(item.name);
+              navigation.navigate("Details", {
+                id: item.id,
+                name: item.name,
+                country: item.country,
+              });
             }}
           >
             <View style={{ padding: 10, borderBottomColor: "white" }}>
@@ -177,4 +214,22 @@ const Recherche = () => {
 
 export default Recherche;
 
-const stylesLocal = StyleSheet.create({});
+const stylesLocal = StyleSheet.create({
+  modalView: {
+    flex: 0.2,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 10,
+    width:200,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "black",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+});
