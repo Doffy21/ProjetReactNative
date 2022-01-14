@@ -1,11 +1,12 @@
 import React from "react";
-import { StyleSheet, Text, View, Image, ToastAndroid, FlatList } from "react-native";
-import { useState, useEffect } from "react";
+import { StyleSheet, Text, View, Image, ToastAndroid, FlatList, TouchableOpacity } from "react-native";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { Divider, Icon } from "react-native-elements";
 import moment from "moment";
 import 'moment/locale/fr'
 
 const DetailsMeteo = ({ route,navigation }) => {
+  const [isRefresh, setIsRefresh] = useState(false)
   const [weather, setWeather] = useState({
     id: route.params.id,
     deg: "0",
@@ -15,21 +16,43 @@ const DetailsMeteo = ({ route,navigation }) => {
     cloudy: "- - -",
     minMax: { min: "- - -", max: "- - -" },
     moreInfos: [
-      {value: "- - -", img: require("../img/full-moon.png")},
-      {value: "- - -", img: require("../img/sunrise.png")},
-      {value: "- - -", img: require("../img/sunset.png")},
-      {value: "- - -", img: require("../img/night.png")}
+      {id: 1,value: "- - -", img: require("../img/full-moon.png")},
+      {id: 2,value: "- - -", img: require("../img/sunrise.png")},
+      {id: 3,value: "- - -", img: require("../img/sunset.png")},
+      {id: 4,value: "- - -", img: require("../img/night.png")}
     ],
     imgWeather: "01d",
     moreDays: [
-      {day: "", date:"", img:"", min:"", max:""},
-      {day: "", date:"", img:"", min:"", max:""},
-      {day: "", date:"", img:"", min:"", max:""},
-      {day: "", date:"", img:"", min:"", max:""}
+      {id: 1,day: "", date:"", img:"", min:"", max:""},
+      {id: 2,day: "", date:"", img:"", min:"", max:""},
+      {id: 3,day: "", date:"", img:"", min:"", max:""},
+      {id: 4,day: "", date:"", img:"", min:"", max:""}
     ]
   });
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => setIsRefresh(true)}
+          style={{ marginRight: 5 }}
+        >
+          <Icon name="refresh" size={28} color={"#fff"} />
+        </TouchableOpacity>
+      ),
+      headerLeft: () => (
+        <TouchableOpacity
+        onPress={() => navigation.popToTop()}
+        style={{ marginRight: 5 }}
+      >
+        <Icon name="arrow-back-outline" size={28} color={"#fff"} type='ionicon' />
+      </TouchableOpacity>
+      )
+    })
+  })
+
   useEffect(() => {
+    setIsRefresh(false)
     fetch(
     `http://api.openweathermap.org/data/2.5/forecast/daily?id=${route.params.id}&cnt=5&appid=94c6cf0868fa5cb930a5e2d71baf0dbf&units=metric&lang=fr`
     )
@@ -49,18 +72,22 @@ const DetailsMeteo = ({ route,navigation }) => {
             },
             moreInfos: [
               {
+                id: 1,
                 value: Math.round(results.list[0].temp.day) + "°C",
                 img: require("../img/full-moon.png"),
               },
               {
+                id: 2,
                 value: moment(results.list[0].sunrise * 1000).format("HH:mm"),
                 img: require("../img/sunrise.png"),
               },
               {
+                id: 3,
                 value: moment(results.list[0].sunset * 1000).format("HH:mm"),
                 img: require("../img/sunset.png"),
               },
               {
+                id: 4,
                 value: Math.round(results.list[0].temp.night) + "°C",
                 img: require("../img/night.png"),
               },
@@ -68,6 +95,7 @@ const DetailsMeteo = ({ route,navigation }) => {
             imgWeather: results.list[0].weather[0].icon,
             moreDays: [
               {
+                id: 1,
                 day: moment(results.list[1].dt * 1000).format("dddd"),
                 date: moment(results.list[1].dt * 1000).format("DD/MM"),
                 img: results.list[1].weather[0].icon,
@@ -75,6 +103,7 @@ const DetailsMeteo = ({ route,navigation }) => {
                 max: Math.round(results.list[1].temp.max),
               },
               {
+                id: 2,
                 day: moment(results.list[2].dt * 1000).format("dddd"),
                 date: moment(results.list[2].dt * 1000).format("DD/MM"),
                 img: results.list[2].weather[0].icon,
@@ -82,6 +111,7 @@ const DetailsMeteo = ({ route,navigation }) => {
                 max: Math.round(results.list[2].temp.max),
               },
               {
+                id: 3,
                 day: moment(results.list[3].dt * 1000).format("dddd"),
                 date: moment(results.list[3].dt * 1000).format("DD/MM"),
                 img: results.list[3].weather[0].icon,
@@ -89,6 +119,7 @@ const DetailsMeteo = ({ route,navigation }) => {
                 max: Math.round(results.list[3].temp.max),
               },
               {
+                id: 4,
                 day: moment(results.list[4].dt * 1000).format("dddd"),
                 date: moment(results.list[4].dt * 1000).format("DD/MM"),
                 img: results.list[4].weather[0].icon,
@@ -105,7 +136,7 @@ const DetailsMeteo = ({ route,navigation }) => {
             ToastAndroid.SHORT
         );
     });
-  }, []);
+  }, [navigation, isRefresh]);
 
   const separator = () => {
     return <Divider orientation="vertical" color="#00AAF7" />;

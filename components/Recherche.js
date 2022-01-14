@@ -10,14 +10,28 @@ import {
   ToastAndroid,
 } from "react-native";
 import styles from "./StyleSheet";
+
 import { Divider, SearchBar } from "react-native-elements";
 import { useState, useEffect } from "react";
-import VilleParDefaut from "./VilleParDefaut";
+
 import filter from "lodash.filter";
+
+import { useDispatch, useSelector } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { addCity } from '../redux/actions/city';
+import { addDetail } from '../redux/actions/detail';
 
 const Recherche = ({ navigation }) => {
   const [search, updateSearch] = useState("");
-  const [data, setData] = useState(VilleParDefaut);
+  const { citys } = useSelector(state => state.cityReducer);
+
+  const dispatch = useDispatch();
+  const actions = bindActionCreators({
+    addCity, 
+    addDetail,
+  }, dispatch);
+
+  const [data, setData] = useState(citys);
   const [fullData, setFullData] = useState(data);
   const [modalVisibe, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -94,7 +108,8 @@ const Recherche = ({ navigation }) => {
 
   // Fonction qui ajoute les villes
   const addNewCity = (id, name, country) => {
-    VilleParDefaut.push({ id: id, name: name, country: country });
+    actions.addCity({ id: id, name: name, country: country })
+    actions.addDetail({ id: id, name: name, country: country })
     setModalVisible(!modalVisibe);
     handleSearch("");
     navigation.navigate("Details", cityFound);
@@ -193,6 +208,7 @@ const Recherche = ({ navigation }) => {
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => {
+              actions.addDetail({ id: item.id, name: item.name, country: item.country })
               navigation.navigate("Details", {
                 id: item.id,
                 name: item.name,
