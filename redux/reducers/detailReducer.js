@@ -1,3 +1,4 @@
+import { ToastAndroid } from "react-native";
 import { GET_DETAIL, REMOVE_DETAIL } from "../constants";
 
 const initialState = {

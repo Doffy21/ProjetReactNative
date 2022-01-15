@@ -21,7 +21,7 @@ const DetailsMeteo = ({ route,navigation }) => {
       {id: 3,value: "- - -", img: require("../img/sunset.png")},
       {id: 4,value: "- - -", img: require("../img/night.png")}
     ],
-    imgWeather: "01d",
+    imgWeather: "04d",
     moreDays: [
       {id: 1,day: "", date:"", img:"", min:"", max:""},
       {id: 2,day: "", date:"", img:"", min:"", max:""},
